@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LD Test - Basic Node.js App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to LD Test</h1>
+        <p>This is a very basic Node.js application with both server-side and HTML frontend.</p>
+        
+        <button onclick="fetchMessage()">Get Message from Server</button>
+        
+        <div id="message"></div>
+    </div>
+
+    <script>
+        async function fetchMessage() {
+            try {
+                const response = await fetch('/api/message');
+                const data = await response.json();
+                const messageDiv = document.getElementById('message');
+                messageDiv.textContent = data.message;
+                messageDiv.style.display = 'block';
+            } catch (error) {
+                console.error('Error fetching message:', error);
+                const messageDiv = document.getElementById('message');
+                messageDiv.textContent = 'Error fetching message from server';
+                messageDiv.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
