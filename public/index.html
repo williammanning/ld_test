@@ -3,70 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LD Test - Basic Node.js App</title>
+    <title>San Jose Cycling Weather</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --ink: #1e2338;
+            --bg-soft: #f4f6ec;
+            --bg-main: #d9e9c8;
+            --card: #fffaf0;
+            --accent: #c45521;
+            --accent-2: #3b7a57;
+            --line: #273247;
+            --muted: #5b6470;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #f5f5f5;
+            margin: 0;
+            font-family: 'Bricolage Grotesque', sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 12% 15%, rgba(196, 85, 33, 0.2), transparent 35%),
+                radial-gradient(circle at 90% 85%, rgba(59, 122, 87, 0.22), transparent 45%),
+                linear-gradient(170deg, var(--bg-main), var(--bg-soft));
+            min-height: 100vh;
         }
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        .layout {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 34px 18px 60px;
         }
-        h1 {
-            color: #333;
+
+        .hero {
+            border: 3px solid var(--line);
+            background: rgba(255, 250, 240, 0.76);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 6px 8px 0 rgba(39, 50, 71, 0.15);
+            animation: rise 450ms ease;
         }
+
+        .hero h1 {
+            margin: 0;
+            font-size: clamp(1.9rem, 4.2vw, 3rem);
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            margin: 10px 0 0;
+            font-size: 1rem;
+            color: var(--muted);
+            max-width: 720px;
+        }
+
+        .toolbar {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
         button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
+            border: 2px solid var(--line);
+            border-radius: 999px;
+            background: var(--accent);
+            color: #fff;
+            padding: 10px 16px;
+            font-size: 0.95rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
+            transition: transform 180ms ease, box-shadow 180ms ease;
         }
+
         button:hover {
-            background-color: #45a049;
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 8px 20px rgba(30, 35, 56, 0.2);
         }
-        #message {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e7f3ff;
-            border-left: 4px solid #2196F3;
-            display: none;
+
+        #status {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.87rem;
+            color: var(--muted);
+            min-height: 18px;
+        }
+
+        .grid {
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .card {
+            border: 2px solid var(--line);
+            border-radius: 20px;
+            background: var(--card);
+            padding: 18px;
+            box-shadow: 4px 5px 0 rgba(39, 50, 71, 0.1);
+            animation: rise 420ms ease both;
+        }
+
+        .card h2 {
+            margin: 0 0 8px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .current {
+            grid-column: span 5;
+        }
+
+        .bike {
+            grid-column: span 7;
+        }
+
+        .temp {
+            font-size: clamp(2.2rem, 6vw, 3.2rem);
+            line-height: 1;
+            margin: 8px 0;
+        }
+
+        .summary {
+            font-size: 1rem;
+            color: var(--muted);
+        }
+
+        .metrics {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.86rem;
+        }
+
+        .bike-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid var(--line);
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.95rem;
+            background: #fff;
+        }
+
+        .bike-score strong {
+            color: var(--accent-2);
+            font-size: 1.05rem;
+        }
+
+        .verdict {
+            margin-top: 10px;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .reasons {
+            margin-top: 8px;
+            font-size: 0.95rem;
+            color: var(--muted);
+        }
+
+        .forecast {
+            grid-column: span 12;
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .day {
+            border: 2px solid var(--line);
+            border-radius: 14px;
+            background: #fff;
+            padding: 12px;
+            animation: rise 450ms ease both;
+        }
+
+        .day-name {
+            margin: 0;
+            font-size: 0.96rem;
+            font-weight: 700;
+        }
+
+        .day-summary {
+            margin: 8px 0;
+            font-size: 0.87rem;
+            color: var(--muted);
+            min-height: 40px;
+        }
+
+        .day-meta {
+            margin: 0;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 880px) {
+            .current {
+                grid-column: span 12;
+            }
+
+            .bike {
+                grid-column: span 12;
+            }
+
+            .forecast-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 520px) {
+            .forecast-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to LD Test</h1>
-        <p>This is a very basic Node.js application with both server-side and HTML frontend.</p>
-        
-        <button onclick="fetchMessage()">Get Message from Server</button>
-        
-        <div id="message"></div>
-    </div>
+    <main class="layout">
+        <section class="hero">
+            <h1>San Jose Cycling Weather</h1>
+            <p>Live weather for San Jose, California with current conditions, a 5 day forecast, and a "should I bike today?" score that also checks an external forecast source.</p>
+            <div class="toolbar">
+                <button id="refresh-button" type="button">Refresh Weather</button>
+                <span id="status" role="status" aria-live="polite"></span>
+            </div>
+        </section>
+
+        <section class="grid">
+            <article class="card current">
+                <h2>Current Conditions</h2>
+                <p id="current-temp" class="temp">Loading...</p>
+                <p id="current-summary" class="summary"></p>
+                <div class="metrics" id="current-metrics"></div>
+            </article>
+
+            <article class="card bike">
+                <h2>Bicycling Check</h2>
+                <div id="bike-score" class="bike-score"></div>
+                <p id="bike-verdict" class="verdict"></p>
+                <p id="bike-reasons" class="reasons"></p>
+            </article>
+
+            <article class="card forecast">
+                <h2>5 Day Forecast</h2>
+                <div id="forecast-grid" class="forecast-grid"></div>
+            </article>
+        </section>
+    </main>
 
     <script>
-        async function fetchMessage() {
+        const refreshButton = document.getElementById('refresh-button');
+        const statusText = document.getElementById('status');
+
+        const currentTemp = document.getElementById('current-temp');
+        const currentSummary = document.getElementById('current-summary');
+        const currentMetrics = document.getElementById('current-metrics');
+
+        const bikeScore = document.getElementById('bike-score');
+        const bikeVerdict = document.getElementById('bike-verdict');
+        const bikeReasons = document.getElementById('bike-reasons');
+
+        const forecastGrid = document.getElementById('forecast-grid');
+
+        const formatDay = (isoDate) => {
+            const value = new Date(`${isoDate}T12:00:00`);
+            return value.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+        };
+
+        const renderCurrent = (data) => {
+            currentTemp.textContent = `${Math.round(data.current.temperature)} degF`;
+            currentSummary.textContent = data.current.summary;
+            currentMetrics.innerHTML = [
+                `Feels like: ${Math.round(data.current.feelsLike)} degF`,
+                `Humidity: ${data.current.humidity}%`,
+                `Wind: ${Math.round(data.current.wind)} mph`,
+                `Precip: ${Number(data.current.precipitation).toFixed(2)} in`,
+                `Updated: ${new Date(data.updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`,
+            ].map((line) => `<div>${line}</div>`).join('');
+        };
+
+        const renderBicycling = (data) => {
+            bikeScore.innerHTML = `<span>Ride score</span> <strong>${data.bicycling.score}/100</strong>`;
+            bikeVerdict.textContent = data.bicycling.verdict;
+
+            const reasons = data.bicycling.reasons.length
+                ? `Why: ${data.bicycling.reasons.join(', ')}.`
+                : 'Why: conditions look friendly for a ride.';
+
+            const source = data.bicycling.sourceSummary
+                ? ` External forecast says: ${data.bicycling.sourceSummary}`
+                : '';
+
+            bikeReasons.textContent = `${reasons}${source}`;
+        };
+
+        const renderForecast = (data) => {
+            forecastGrid.innerHTML = data.forecast.map((day) => {
+                return `
+                    <article class="day">
+                        <p class="day-name">${formatDay(day.date)}</p>
+                        <p class="day-summary">${day.summary}</p>
+                        <p class="day-meta">
+                            High/Low: ${Math.round(day.maxTemp)} / ${Math.round(day.minTemp)} degF<br>
+                            Rain chance: ${day.precipChance}%<br>
+                            Wind max: ${Math.round(day.windMax)} mph
+                        </p>
+                    </article>
+                `;
+            }).join('');
+        };
+
+        const setStatus = (text) => {
+            statusText.textContent = text;
+        };
+
+        const loadWeather = async () => {
+            setStatus('Loading latest weather...');
+            refreshButton.disabled = true;
+
             try {
-                const response = await fetch('/api/message');
+                const response = await fetch('/api/weather/san-jose');
+                if (!response.ok) {
+                    const body = await response.text();
+                    throw new Error(body || 'Failed weather request');
+                }
+
                 const data = await response.json();
-                const messageDiv = document.getElementById('message');
-                messageDiv.textContent = data.message;
-                messageDiv.style.display = 'block';
+                renderCurrent(data);
+                renderBicycling(data);
+                renderForecast(data);
+                setStatus('Updated just now.');
             } catch (error) {
-                console.error('Error fetching message:', error);
-                const messageDiv = document.getElementById('message');
-                messageDiv.textContent = 'Error fetching message from server';
-                messageDiv.style.display = 'block';
+                console.error(error);
+                setStatus('Could not load weather right now.');
+                currentTemp.textContent = 'Unavailable';
+            } finally {
+                refreshButton.disabled = false;
             }
-        }
+        };
+
+        refreshButton.addEventListener('click', loadWeather);
+        loadWeather();
     </script>
 </body>
 </html>

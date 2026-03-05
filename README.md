@@ -22,7 +22,17 @@ Start the server:
 npm start
 ```
 
-The application will be available at `http://localhost:3000`
+Create a `.env` file with the required keys:
+
+```bash
+GEMINI_API_KEY=your-gemini-api-key
+
+# Optional
+GEMINI_MODEL=gemini-pro
+PORT=3001
+```
+
+The application will be available at `http://localhost:3001`
 
 ## API Endpoints
 
